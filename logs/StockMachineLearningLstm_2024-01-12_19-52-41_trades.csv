@@ -1,0 +1,15 @@
+time,strategy,symbol,side,type,status,multiplier,time_in_force,asset.strike,asset.multiplier,asset.asset_type,price,filled_quantity,trade_cost
+2020-01-02 09:30:00-05:00,StockMachineLearningLstm,NVDA,buy,market,new,1,gtc,0.0,1,stock,,,
+2020-01-02 09:30:00-05:00,StockMachineLearningLstm,NVDA,buy,market,fill,1,gtc,0.0,1,stock,59.6875,753,0.0
+2020-01-02 09:45:00-05:00,StockMachineLearningLstm,NVDA,buy,market,new,1,gtc,0.0,1,stock,,,
+2020-01-02 09:45:00-05:00,StockMachineLearningLstm,NVDA,buy,market,fill,1,gtc,0.0,1,stock,59.7225,753,0.0
+2020-03-16 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,new,1,gtc,0.0,1,stock,,,
+2020-03-16 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,fill,1,gtc,0.0,1,stock,53.1025,763,0.0
+2020-03-16 09:45:00-04:00,StockMachineLearningLstm,NVDA,buy,market,new,1,gtc,0.0,1,stock,,,
+2020-03-16 09:45:00-04:00,StockMachineLearningLstm,NVDA,buy,market,fill,1,gtc,0.0,1,stock,52.2575,770,0.0
+2020-03-26 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,new,1,gtc,0.0,1,stock,,,
+2020-03-26 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,fill,1,gtc,0.0,1,stock,63.485,754,0.0
+2020-08-11 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,new,1,gtc,0.0,1,stock,,,
+2020-08-11 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,fill,1,gtc,0.0,1,stock,110.7375,578,0.0
+2022-03-14 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,new,1,gtc,0.0,1,stock,,,
+2022-03-14 09:30:00-04:00,StockMachineLearningLstm,NVDA,sell,market,fill,1,gtc,0.0,1,stock,218.69,332,0.0
