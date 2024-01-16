@@ -11,7 +11,7 @@ pandas = "2.0.3"
 ta = "0.10.2"
 torch = "1.13.1"
 scikit-learn = "1.2.2"
-lumibot = ">=2.9.10"
+lumibot = "2.9.13"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.4"
