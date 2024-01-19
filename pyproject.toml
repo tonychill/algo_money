@@ -5,14 +5,13 @@ description = "A brief description of your project"
 authors = ["Stacey Smith <quedogf94@yahoo.com>"]
 
 [tool.poetry.dependencies]
-python = "3.10.11"  # Specify your Python version here
+python = "3.9.13"  # Specify your Python version here
 numpy = "1.23.5"
 pandas = "2.0.3"
 ta = "0.10.2"
 torch = "1.13.1"
 scikit-learn = "1.2.2"
 lumibot = "2.9.13"
-alpaca-trade-api = "2.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.4"
