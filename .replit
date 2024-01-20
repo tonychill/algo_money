@@ -1,4 +1,4 @@
-run = "python machine_learning_pytorch_lstm_colab.py"
+run = "poetry run python stock_machine_learning_lstm.py"
 modules = ["python-3.10:v18-20230807-322e88b"]
 
 hidden = [".pythonlibs"]
@@ -10,5 +10,5 @@ channel = "stable-23_05"
 language = "python3"
 
 [deployment]
-run = ["python3", "machine_learning_pytorch_lstm_colab.py"]
+run = ["python3", "stock_machine_learning_lstm.py"]
 deploymentTarget = "cloudrun"
