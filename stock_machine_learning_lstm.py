@@ -19,9 +19,13 @@ from torch.autograd import Variable
 
 # from credentials import ALPACA_CONFIG, POLYGON_CONFIG
 
-# Load environment variables
-APCA_API_KEY_ID = os.getenv("ALPACA_API_KEY")
-APCA_API_SECRET_KEY = os.getenv("ALPACA_API_SECRET")
+# ALPACA Configuration
+ALPACA_CONFIG = {
+    "API_KEY": os.getenv("ALPACA_API_KEY", "default_api_key"),  # Provide default value or handle None
+    "API_SECRET": os.getenv("ALPACA_API_SECRET", "default_api_secret"),
+    "PAPER": os.getenv("ALPACA_IS_PAPER", True),
+}
+# POLYGON Configuration
 POLYGON_API_KEY = os.getenv("POLYGON_API_KEY")
 
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1" # This should work, but had to set it manually in the terminal or in the zshrc file
