@@ -511,7 +511,13 @@ class StockMachineLearningLstm(Strategy):
 
 
 if __name__ == "__main__":
-    is_live = False
+    # Get the string value from the environment variable.
+    # Default to "False" if the variable is not set.
+    is_live_str = os.environ.get("IS_LIVE", "False")
+
+    # Convert the string to a boolean.
+    # This will be True if the string is "True", and False otherwise.
+    is_live = is_live_str.lower() != "false"
 
     if is_live:
         ####
