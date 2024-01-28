@@ -23,9 +23,25 @@ poetry env use python3.10
 ### You can list all virtual environments managed by Poetry with:
 poetry env list
 
+### On replit, pytorch is to large to install in the poetry lock file, so it must be preinstalled
+
+poetry add torch==1.13.1
+
+### Install poetry dependencies from pyproject.toml
+poetry install
+
 ### You can run your Python scripts directly in the environment managed by Poetry. For example:
 poetry run python stock_machine_learning_lstm.py
 poetry run python machine_learning_pytorch_lstm_colab.py
 
 ### If you're using Jupyter notebooks, you can start Jupyter Notebook or JupyterLab in the Poetry-managed environment:
 poetry run jupyter notebook
+
+## Add these secrets to the secrets in replit
+{
+  "POLYGON_API_KEY": "value",
+  "ALPACA_API_KEY": "value",
+  "ALPACA_API_SECRET": "value",
+  "IS_LIVE": "True",
+  "ALPACA_IS_PAPER": "True"
+}

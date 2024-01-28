@@ -34,6 +34,7 @@ has_gpu = torch.cuda.is_available()
 has_mps = getattr(torch,'has_mps',False)
 device = "cpu" if getattr(torch,'has_mps',False) \
     else "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device: {device}")
 
 # LSTM model definition
 class LSTM(nn.Module):
@@ -118,7 +119,6 @@ loss_fn = nn.MSELoss()
 
 class StockMachineLearningLstm(Strategy):
 
-    # trading_info = pd.DataFrame(columns=['Date of Prediction', 'Expected Price Change', 'Expected Price Change Pct', 'Expected Change Threshold Up', 'Current Price', 'Limit', 'Stop Loss', 'Order'])
     parameters = {
         "asset": Asset(symbol="NVDA", asset_type="stock"),
         "compute_frequency": 15,  # The time (in minutes) that we should retrain our model and make a prediction
@@ -514,7 +514,9 @@ if __name__ == "__main__":
     # Get the string value from the environment variable.
     # Default to "False" if the variable is not set.
     is_live_str = os.environ.get("IS_LIVE", "False")
-
+    # Added the line below so I can bypass the environment variable,
+    # comment out the below line if you want to use the environment variable
+    # is_live_str = "False"
     # Convert the string to a boolean.
     # This will be True if the string is "True", and False otherwise.
     is_live = is_live_str.lower() != "false"
@@ -539,8 +541,8 @@ if __name__ == "__main__":
         # Backtest
         ####
 
-        backtesting_start = datetime(2020, 1, 1)
-        backtesting_end = datetime(2023, 12, 15)
+        backtesting_start = datetime(2023, 12, 1)
+        backtesting_end = datetime(2024, 1, 24)
 
         ####
         # Get and Organize Data

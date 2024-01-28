@@ -1,2 +1,3 @@
 logs/
 installed_packages.py
+.pythonlibs/
