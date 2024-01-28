@@ -45,3 +45,15 @@ poetry run jupyter notebook
   "IS_LIVE": "True",
   "ALPACA_IS_PAPER": "True"
 }
+
+# Create Replit
+1. Inside Replit, click the "Create Replit" button
+2. Click the "Import from GitHub" button
+3. Add the GitHub account if not already listed.
+4. Add Secrets
+5. Deploy
+## If you get this error
+[Errno 122] Disk quota exceeded: '/home/runner/858f45ce-b2ed-4b2a-b336-ad43f75309d7/.pythonlibs/lib/python3.10/site-packages/plotly/validators/treemap/stream/_token.py'
+### Is because on replit, pytorch is to large to install in the poetry lock file, so it must be preinstalled
+### Execute this command from the shell
+poetry add torch==1.13.1
