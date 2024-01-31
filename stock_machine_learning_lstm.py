@@ -120,27 +120,31 @@ loss_fn = nn.MSELoss()
 class StockMachineLearningLstm(Strategy):
 
     parameters = {
-        "asset": Asset(symbol="NVDA", asset_type="stock"),
-        "compute_frequency": 15,  # The time (in minutes) that we should retrain our model and make a prediction
+        "asset": Asset(symbol="BTC", asset_type="crypto"),
+        # "asset": Asset(symbol="NVDA", asset_type="stock"),
+        "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
         # "compute_frequency": 1440,  # 1440 minutes = 1 day
+        # "compute_frequency": 2000,  # 2880 minutes = 2 day
         #2000 initial lookback period = 2000 * 15 = 30,000 minutes = 20.833 days
-        "initial_lookback_period": 4000,  # Increasing this will improve accuracy but will take longer to train
+        "initial_lookback_period": 0,  # Increasing this will improve accuracy but will take longer to train
         "initial_epochs": 100,  # The number of epochs to train the model for initially
         "iteration_epochs": 100,  # The number of epochs to train the model for on each iteration
         "learning_rate_initial": 0.001,  # The learning rate for the model initially
         "learning_rate_iteration": 0.003,  # The learning rate for the model on each iteration
         "pct_portfolio_per_trade": 0.45,  # What percentage of the portfolio to trade in each trade. Eg. If the portfolio is worth $100k and this is 0.5, then each trade will be worth $50k
+        # "pct_portfolio_per_trade": 1,  # What percentage of the portfolio to trade in each trade. Eg. If the portfolio is worth $100k and this is 0.5, then each trade will be worth $50k
         # "price_change_threshold_up": 0.05,  # The difference between predicted price and the current price that will trigger a buy order (in percentage change).
         # "price_change_threshold_down": -0.08,  # The difference between predicted price and the current price that will trigger a sell order (in percentage change).
-        "price_change_threshold_up": 0.003,  # The difference between predicted price and the current price that will trigger a buy order (in percentage change).
-        "price_change_threshold_down": -0.003,  # The difference between predicted price and the current price that will trigger a sell order (in percentage change).
+        # "price_change_threshold_up": 0.0001,  # The difference between predicted price and the current price that will trigger a buy order (in percentage change).
+        "price_change_threshold_up": 0.00005,  # The difference between predicted price and the current price that will trigger a buy order (in percentage change).
+        "price_change_threshold_down": -0.00020,  # The difference between predicted price and the current price that will trigger a sell order (in percentage change).
         "max_pct_portfolio_long": 1,  # The maximum that the strategy will buy as a percentage of the portfolio (eg. if this is 0.8 - or 80% - and our portfolio is worth $100k, then we will stop buying when we own $80k worth of the symbol)
         "max_pct_portfolio_short": 0.3,  # The maximum that the strategy will sell as a percentage of the portfolio (eg. if this is 0.8 - or 80% - and our portfolio is worth $100k, then we will stop selling when we own $80k worth of the symbol)
         "take_profit_factor": 1,  # Where you place your limit order based on the prediction, eg. if the prediction is 1.05 and this is 1.1, then the limit order will be placed at 1.05 * 1.1 = 1.155
         "stop_loss_factor": 0.5,  # Where you place your stop order based on the prediction, eg. if the prediction is 1.05 and this is 0.9, then the stop order will be placed at 1.05 * 0.9 = 0.945
         "cache_directory": "default_directory"  # Default value or dynamically assigned
     }
-    trading_info = pd.DataFrame(columns=['Date of Prediction', 'Expected Price Change', 'Expected Price Change Pct', 'Expected Change Threshold Up', 'Current Price', 'Limit', 'Stop Loss', 'Order'])    
+    trading_info = pd.DataFrame(columns=['Date of Prediction', 'Expected Price Change', 'Expected Price Change Pct', 'Expected Change Threshold Up', 'Expected Change Threshold Down', 'Current Price', 'Limit', 'Stop Loss', 'Order'])    
 
     def save_trading_info(self):
         # Construct the file path by combining the cache directory with the customized filename
@@ -151,6 +155,7 @@ class StockMachineLearningLstm(Strategy):
         self.trading_info.to_csv(file_path, index=True)
 
     def initialize(self):
+        self.set_market("24/7")
         # Extract asset symbol and compute frequency from parameters
         self.asset_symbol = self.parameters['asset'].symbol
         self.asset = self.parameters['asset']  # Initialize the asset attribute
@@ -312,8 +317,9 @@ class StockMachineLearningLstm(Strategy):
             'Date of Prediction': dt,
             'Portfolio Value': self.portfolio_value,
             'Expected Price Change': expected_price_change,
-            'Expected Price Change Pct': expected_price_change_pct,
-            'Expected Change Threshold Up': price_change_threshold_up,
+            'Expected Price Change Pct': f"{expected_price_change_pct:.5f}",
+            'Expected Change Threshold Up': f"{price_change_threshold_up:.5f}",  # Formatted as a string with 5 decimal places
+            'Expected Change Threshold Down': f"{price_change_threshold_down:.5f}",  # Formatted as a string with 5 decimal places
             'Current Price': last_price,
             'Limit': np.nan,  # Placeholder for limit value
             'Stop Loss': np.nan,  # Placeholder for stop loss value
@@ -326,16 +332,19 @@ class StockMachineLearningLstm(Strategy):
 
 
         # Our machine learning model is predicting that the asset will increase in value
+        print(f"Expected Price Change Pct: {expected_price_change_pct:.5f}")
+        print(f"Expected Change Threshold Up: {price_change_threshold_up:.5f}")
+        print(f"Expected Change Threshold Down: {price_change_threshold_down:.5f}")
         if expected_price_change_pct > price_change_threshold_up:
             #print expected price change
-            print("\n")
+            # print("\n")
             #Date of prediction
-            print(f"Date of Prediction: {dt}")
-            print(f"Expected Price Change: {expected_price_change}")
+            # print(f"Date of Prediction: {dt}")
+            # print(f"Expected Price Change: {expected_price_change}")
             #print expected price change pct
-            print(f"Expected Price Change Pct: {expected_price_change_pct}")
+            # print(f"Expected Price Change Pct: {expected_price_change_pct}")
             #print expected change threshold up
-            print(f"Expected Change Threshold Up: {price_change_threshold_up}")
+            # print(f"Expected Change Threshold Up: {price_change_threshold_up}")
             max_allocation = self.parameters["max_pct_portfolio_long"] * self.portfolio_value
             available_allocation = max_allocation - asset_value
             value_to_trade = min(self.portfolio_value * pct_portfolio_per_trade, available_allocation)
@@ -458,9 +467,7 @@ class StockMachineLearningLstm(Strategy):
         """
         data_length = window_size + 40
 
-        bars = self.get_historical_prices(
-            asset, data_length, "minute", quote=quote_asset
-        )
+        bars = self.get_historical_prices(asset, data_length, "minute")
         data = bars.df
 
         times = data.index.to_series()
@@ -512,16 +519,14 @@ class StockMachineLearningLstm(Strategy):
 
 if __name__ == "__main__":
     # Get the string value from the environment variable.
-    # Default to "False" if the variable is not set.
-    is_live_str = os.environ.get("IS_LIVE", "False")
+    # Check if we are backtesting or not
+    IS_BACKTESTING = os.environ.get("IS_BACKTESTING")
     # Added the line below so I can bypass the environment variable,
     # comment out the below line if you want to use the environment variable
-    # is_live_str = "False"
+    IS_BACKTESTING = "False"
     # Convert the string to a boolean.
     # This will be True if the string is "True", and False otherwise.
-    is_live = is_live_str.lower() != "false"
-
-    if is_live:
+    if not IS_BACKTESTING or IS_BACKTESTING.lower() == "false":
         ####
         # Run the strategy
         ####
@@ -536,24 +541,25 @@ if __name__ == "__main__":
         trader.add_strategy(strategy)
         trader.run_all()
 
-    else:
+    elif IS_BACKTESTING.lower() == "true":
         ####
         # Backtest
         ####
 
-        backtesting_start = datetime(2023, 12, 1)
+        backtesting_start = datetime(2023, 1, 1)
         backtesting_end = datetime(2024, 1, 24)
 
         ####
         # Get and Organize Data
         ####
 
-        strategy = StockMachineLearningLstm.backtest(
+        StockMachineLearningLstm.backtest(
             PolygonDataBacktesting,
             # YahooDataBacktesting,
             backtesting_start,
             backtesting_end,
-            benchmark_asset="NVDA",
+            # benchmark_asset="NVDA",
+            benchmark_asset=Asset(symbol="BTC", asset_type="crypto"),
             polygon_api_key=POLYGON_API_KEY,
             polygon_has_paid_subscription=True,
         )
