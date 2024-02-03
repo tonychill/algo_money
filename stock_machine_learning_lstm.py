@@ -120,19 +120,21 @@ loss_fn = nn.MSELoss()
 class StockMachineLearningLstm(Strategy):
 
     parameters = {
-        "asset": Asset(symbol="BTC", asset_type="crypto"),
+        "asset": Asset(symbol="ETH", asset_type="crypto"), # "BTC", "ETH", "LTC"
         # "asset": Asset(symbol="NVDA", asset_type="stock"),
-        "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
+        # "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
+        "compute_frequency": 60,  # The time (in minutes) that we should retrain our model and make a prediction
         # "compute_frequency": 1440,  # 1440 minutes = 1 day
         # "compute_frequency": 2000,  # 2880 minutes = 2 day
         #2000 initial lookback period = 2000 * 15 = 30,000 minutes = 20.833 days
-        "initial_lookback_period": 0,  # Increasing this will improve accuracy but will take longer to train
+        "initial_lookback_period": 100,  # Increasing this will improve accuracy but will take longer to train
+        # "initial_lookback_period": 0,  # Increasing this will improve accuracy but will take longer to train
         "initial_epochs": 100,  # The number of epochs to train the model for initially
         "iteration_epochs": 100,  # The number of epochs to train the model for on each iteration
         "learning_rate_initial": 0.001,  # The learning rate for the model initially
         "learning_rate_iteration": 0.003,  # The learning rate for the model on each iteration
-        "pct_portfolio_per_trade": 0.45,  # What percentage of the portfolio to trade in each trade. Eg. If the portfolio is worth $100k and this is 0.5, then each trade will be worth $50k
-        # "pct_portfolio_per_trade": 1,  # What percentage of the portfolio to trade in each trade. Eg. If the portfolio is worth $100k and this is 0.5, then each trade will be worth $50k
+        # "pct_portfolio_per_trade": 0.45,  # What percentage of the portfolio to trade in each trade. Eg. If the portfolio is worth $100k and this is 0.5, then each trade will be worth $50k
+        "pct_portfolio_per_trade": .95,  # What percentage of the portfolio to trade in each trade. Eg. If the portfolio is worth $100k and this is 0.5, then each trade will be worth $50k
         # "price_change_threshold_up": 0.05,  # The difference between predicted price and the current price that will trigger a buy order (in percentage change).
         # "price_change_threshold_down": -0.08,  # The difference between predicted price and the current price that will trigger a sell order (in percentage change).
         # "price_change_threshold_up": 0.0001,  # The difference between predicted price and the current price that will trigger a buy order (in percentage change).
@@ -226,10 +228,14 @@ class StockMachineLearningLstm(Strategy):
         dt = self.get_datetime()
 
         # Get the historical prices
-        price_df = self.get_data(
-            # TODO: This does not need to get so much data because it should be trained already at init (remove lookpack_period)
-            asset, self.quote_asset, compute_frequency + 1
-        )
+        if os.environ.get("IS_BACKTESTING") == "True":
+            price_df = self.get_data(
+                asset, self.quote_asset, compute_frequency+1
+            )
+        else:
+            price_df = self.get_data(
+                asset, self.quote_asset, compute_frequency * self.initial_lookback_period 
+            )
 
         # The current price of the asset
         last_price = self.get_last_price(asset)
@@ -335,25 +341,15 @@ class StockMachineLearningLstm(Strategy):
         print(f"Expected Price Change Pct: {expected_price_change_pct:.5f}")
         print(f"Expected Change Threshold Up: {price_change_threshold_up:.5f}")
         print(f"Expected Change Threshold Down: {price_change_threshold_down:.5f}")
+        print(f"Checking if {expected_price_change_pct:.5f} > {price_change_threshold_up:.5f}")
+        print(f"Checking if {expected_price_change_pct:.5f} < {price_change_threshold_down:.5f}")
         if expected_price_change_pct > price_change_threshold_up:
-            #print expected price change
-            # print("\n")
-            #Date of prediction
-            # print(f"Date of Prediction: {dt}")
-            # print(f"Expected Price Change: {expected_price_change}")
-            #print expected price change pct
-            # print(f"Expected Price Change Pct: {expected_price_change_pct}")
-            #print expected change threshold up
-            # print(f"Expected Change Threshold Up: {price_change_threshold_up}")
             max_allocation = self.parameters["max_pct_portfolio_long"] * self.portfolio_value
             available_allocation = max_allocation - asset_value
             value_to_trade = min(self.portfolio_value * pct_portfolio_per_trade, available_allocation)
             quantity = int(value_to_trade / last_price)
-
-
             # Define maximum allocation for a single asset
             max_allocation = self.portfolio_value * self.parameters["max_pct_portfolio_long"]
-
             # Only execute a buy order if we have not reached our maximum allocation
             # Print portfolio value and max allocation and asset value
             #print available allocation
@@ -384,22 +380,9 @@ class StockMachineLearningLstm(Strategy):
                 print("\n")
                 print(f"Current Price: {last_price}")
                 print(f"Limit: {limit}, Stop Loss: {stop_loss}")
-                # order = self.create_order(
-                #     asset,
-                #     quantity,
-                #     "sell",
-                #     take_profit_price=limit,
-                #     stop_loss_price=stop_loss,
-                #     position_filled=True,
-                #     type="oco",
-                # )
-                # self.submit_order(order)
-                # Update row_data with specific values
                 always_recorded_row['Limit'] = limit
                 always_recorded_row['Stop Loss'] = stop_loss
                 always_recorded_row['Order'] = str(main_order)# + str(order)
-            
-
         # Our machine learning model is predicting that the asset will decrease in value
         elif expected_price_change_pct < price_change_threshold_down:
             max_position_size = max_pct_portfolio_short * self.portfolio_value
@@ -432,23 +415,10 @@ class StockMachineLearningLstm(Strategy):
                 print("\n")
                 print(f"Current Price: {last_price}")
                 print(f"Limit: {limit}, Stop Loss: {stop_loss}")
-                # order = self.create_order(
-                #     asset,
-                #     quantity,
-                #     "buy",
-                #     take_profit_price=limit,
-                #     stop_loss_price=stop_loss,
-                #     position_filled=True,
-                #     quote=self.quote_asset,
-                #     type="oco",
-                # )
-                # self.submit_order(order)
                 # Update row_data with specific values
                 always_recorded_row['Limit'] = limit
                 always_recorded_row['Stop Loss'] = stop_loss
                 always_recorded_row['Order'] = str(main_order) #+ str(order)
-                #update recording row with cash
-                #always_recorded_row['Cash'] = self.cash
         self.trading_info = pd.concat([self.trading_info, pd.DataFrame([always_recorded_row])], ignore_index=False)
         #if you have reached the end date then save the trading info
         print(dt)
@@ -547,7 +517,7 @@ if __name__ == "__main__":
         ####
 
         backtesting_start = datetime(2023, 1, 1)
-        backtesting_end = datetime(2024, 1, 24)
+        backtesting_end = datetime(2024, 1, 30)
 
         ####
         # Get and Organize Data
@@ -559,7 +529,7 @@ if __name__ == "__main__":
             backtesting_start,
             backtesting_end,
             # benchmark_asset="NVDA",
-            benchmark_asset=Asset(symbol="BTC", asset_type="crypto"),
+            benchmark_asset=Asset(symbol="ETH", asset_type="crypto"),# "BTC", "ETH", "LTC"
             polygon_api_key=POLYGON_API_KEY,
             polygon_has_paid_subscription=True,
         )
