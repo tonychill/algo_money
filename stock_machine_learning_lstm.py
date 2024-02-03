@@ -122,8 +122,8 @@ class StockMachineLearningLstm(Strategy):
     parameters = {
         "asset": Asset(symbol="ETH", asset_type="crypto"), # "BTC", "ETH", "LTC"
         # "asset": Asset(symbol="NVDA", asset_type="stock"),
-        # "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
-        "compute_frequency": 60,  # The time (in minutes) that we should retrain our model and make a prediction
+        "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
+        # "compute_frequency": 60,  # The time (in minutes) that we should retrain our model and make a prediction
         # "compute_frequency": 1440,  # 1440 minutes = 1 day
         # "compute_frequency": 2000,  # 2880 minutes = 2 day
         #2000 initial lookback period = 2000 * 15 = 30,000 minutes = 20.833 days
@@ -223,6 +223,7 @@ class StockMachineLearningLstm(Strategy):
         cache_directory = self.parameters["cache_directory"]
         iteration_epochs = self.parameters["iteration_epochs"]
         learning_rate_iteration = self.parameters["learning_rate_iteration"]
+        initial_lookback_period = self.parameters["initial_lookback_period"]
 
         # Get the current time
         dt = self.get_datetime()
@@ -233,8 +234,9 @@ class StockMachineLearningLstm(Strategy):
                 asset, self.quote_asset, compute_frequency+1
             )
         else:
+            print(f"Inital Lookback Period: {initial_lookback_period}")
             price_df = self.get_data(
-                asset, self.quote_asset, compute_frequency * self.initial_lookback_period 
+                asset, self.quote_asset, compute_frequency * initial_lookback_period 
             )
 
         # The current price of the asset
@@ -493,7 +495,7 @@ if __name__ == "__main__":
     IS_BACKTESTING = os.environ.get("IS_BACKTESTING")
     # Added the line below so I can bypass the environment variable,
     # comment out the below line if you want to use the environment variable
-    # IS_BACKTESTING = "False"
+    IS_BACKTESTING = "False"
     # Convert the string to a boolean.
     # This will be True if the string is "True", and False otherwise.
     if not IS_BACKTESTING or IS_BACKTESTING.lower() == "false":
