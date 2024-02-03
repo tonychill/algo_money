@@ -122,8 +122,8 @@ class StockMachineLearningLstm(Strategy):
     parameters = {
         "asset": Asset(symbol="ETH", asset_type="crypto"), # "BTC", "ETH", "LTC"
         # "asset": Asset(symbol="NVDA", asset_type="stock"),
-        "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
-        # "compute_frequency": 60,  # The time (in minutes) that we should retrain our model and make a prediction
+        # "compute_frequency": 1,  # The time (in minutes) that we should retrain our model and make a prediction
+        "compute_frequency": 60,  # The time (in minutes) that we should retrain our model and make a prediction
         # "compute_frequency": 1440,  # 1440 minutes = 1 day
         # "compute_frequency": 2000,  # 2880 minutes = 2 day
         #2000 initial lookback period = 2000 * 15 = 30,000 minutes = 20.833 days
@@ -495,7 +495,7 @@ if __name__ == "__main__":
     IS_BACKTESTING = os.environ.get("IS_BACKTESTING")
     # Added the line below so I can bypass the environment variable,
     # comment out the below line if you want to use the environment variable
-    IS_BACKTESTING = "False"
+    # IS_BACKTESTING = "False"
     # Convert the string to a boolean.
     # This will be True if the string is "True", and False otherwise.
     if not IS_BACKTESTING or IS_BACKTESTING.lower() == "false":
