@@ -493,7 +493,7 @@ if __name__ == "__main__":
     IS_BACKTESTING = os.environ.get("IS_BACKTESTING")
     # Added the line below so I can bypass the environment variable,
     # comment out the below line if you want to use the environment variable
-    IS_BACKTESTING = "False"
+    # IS_BACKTESTING = "False"
     # Convert the string to a boolean.
     # This will be True if the string is "True", and False otherwise.
     if not IS_BACKTESTING or IS_BACKTESTING.lower() == "false":
