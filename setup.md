@@ -23,12 +23,25 @@ poetry env use python3.10
 ### You can list all virtual environments managed by Poetry with:
 poetry env list
 
+### Execute poetry show to list depedencies installed from the pyproject.toml file
+poetry show
+
+### use this command in the terminal after executing <poetry shell>
+# pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+
+### Activate the Poetry Environment
+### Once you're in the project directory, you can activate the project-specific virtual environment using:
+poetry shell
+
 ### On replit, pytorch is to large to install in the poetry lock file, so it must be preinstalled
 
 poetry add torch==1.13.1
 
 ### Install poetry dependencies from pyproject.toml
 poetry install
+
+### Poetry update, updates the depencies latest versions
+poetry update
 
 ### You can run your Python scripts directly in the environment managed by Poetry. For example:
 poetry run python stock_machine_learning_lstm.py
