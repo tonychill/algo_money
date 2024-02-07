@@ -54,7 +54,19 @@ class LSTM(nn.Module):
     
 # Training function
 def train_model(model, optimiser, loss_fn, X_train, y_train, n_epochs):
+    # This line reshapes the y_train tensor. The method .view(-1, 1) changes the shape of y_train to have a 
+    #single column with as many rows as necessary to maintain the same data. 
+    #This is often done to ensure the target tensor is in the correct shape for the loss function, typically [batch_size, output_size].
     y_train = y_train.view(-1, 1)
+    # This line starts a loop that will iterate n_epochs times. Each iteration represents a 
+    # complete pass over the entire training dataset, known as an epoch.
+
+    - **For each epoch**: Measures the epoch's duration, sets the model to training mode, and resets the gradients.
+    - **Computes predictions** (`outputs`) from the input data (`X_train`) and adjusts their shape if necessary to match the target data (`y_train`).
+    - **Calculates the loss** between predictions and targets using a specified loss function (`loss_fn`), then performs backpropagation to compute gradients.
+    - **Updates the model parameters** using an optimizer (`optimiser`), based on the calculated gradients.
+    - **Monitors and prints** the loss and training speed (iterations per second) every 100 epochs.
+    # This loop iteratively adjusts the model's parameters to minimize the loss function, effectively training the model on the dataset represented by `X_train` and `y_train`.
     for epoch in range(n_epochs):
         start_time = time.time()
         model.train()
@@ -81,19 +93,25 @@ def train_from_df(df, compute_frequency, n_epochs, learning_rate, model):
     # Get the last row of data to use for prediction
     last_row = df.copy().iloc[[-1]]
     
-    # Drop the last row of data as it will be used for prediction
+    # Removes rows with missing values from the DataFrame.
     data_train = df.dropna()
     
-    # Standardize and normalize data
+    #  Scales the features (excluding the close_future column) using standard scaling (mean removal and variance scaling). 
+    # This is a common preprocessing step to normalize the input features, improving the model's convergence during training.
     X_train_scaled = ss.fit_transform(data_train.drop(columns=['close_future']))
+    # Scales the target variable (close_future) using min-max scaling, which transforms the data to a specified range 
+    # (typically [0, 1]). This normalization can help with the model's performance.
     y_train_scaled = mm.fit_transform(data_train[['close_future']])
 
-    # Convert to tensors
+    # Converts the scaled features into a PyTorch tensor and transfers it to the appropriate device (CPU or GPU/MPS) for training.
     X_train_tensors = Variable(torch.Tensor(X_train_scaled)).to(device)
+    #  Converts the scaled target variable into a PyTorch tensor and transfers it to the appropriate device.
     y_train_tensors = Variable(torch.Tensor(y_train_scaled)).to(device)
 
-    # Reshape for LSTM input
+    # Reshapes the features tensor for LSTM input. LSTM expects input in the form of [batch_size, sequence_length, features], 
+    # and since we are dealing with time series data where each row is treated as a separate sequence, sequence_length is set to 1.
     X_train_tensors_final = torch.reshape(X_train_tensors, (X_train_tensors.shape[0], 1, X_train_tensors.shape[1]))
+    # Reshapes the target tensor to match the expected input shape of the model
     y_train_tensors_final = torch.reshape(y_train_tensors, (y_train_tensors.shape[0], 1, y_train_tensors.shape[1]))
 
     # Assuming this is inside your training loop right before you call train_model
