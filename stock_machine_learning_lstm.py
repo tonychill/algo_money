@@ -61,11 +61,11 @@ def train_model(model, optimiser, loss_fn, X_train, y_train, n_epochs):
     # This line starts a loop that will iterate n_epochs times. Each iteration represents a 
     # complete pass over the entire training dataset, known as an epoch.
 
-    - **For each epoch**: Measures the epoch's duration, sets the model to training mode, and resets the gradients.
-    - **Computes predictions** (`outputs`) from the input data (`X_train`) and adjusts their shape if necessary to match the target data (`y_train`).
-    - **Calculates the loss** between predictions and targets using a specified loss function (`loss_fn`), then performs backpropagation to compute gradients.
-    - **Updates the model parameters** using an optimizer (`optimiser`), based on the calculated gradients.
-    - **Monitors and prints** the loss and training speed (iterations per second) every 100 epochs.
+    # For each epoch: Measures the epoch's duration, sets the model to training mode, and resets the gradients.
+    # Computes predictions** (`outputs`) from the input data (`X_train`) and adjusts their shape if necessary to match the target data (`y_train`).
+    # Calculates the loss** between predictions and targets using a specified loss function (`loss_fn`), then performs backpropagation to compute gradients.
+    # Updates the model parameters** using an optimizer (`optimiser`), based on the calculated gradients.
+    # Monitors and prints** the loss and training speed (iterations per second) every 100 epochs.
     # This loop iteratively adjusts the model's parameters to minimize the loss function, effectively training the model on the dataset represented by `X_train` and `y_train`.
     for epoch in range(n_epochs):
         start_time = time.time()
